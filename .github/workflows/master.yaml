@@ -3,7 +3,7 @@ description: 'deploy and test only cloudformation stacks on PR. Push mysite dire
 on:
     push:
         branches:
-            - main
+            - master
         paths: 
             - 'mysite/**'
     pull_request:
