@@ -1,16 +1,37 @@
 import * as cdk from 'aws-cdk-lib/core';
 import { Construct } from 'constructs';
 // import * as sqs from 'aws-cdk-lib/aws-sqs';
+import * as s3 from 'aws-cdk-lib/aws-s3';
+import * as cloudfront from 'aws-cdk-lib/aws-cloudfront';
+import { S3BucketOrigin} from 'aws-cdk-lib/aws-cloudfront-origins';
+
 
 export class CdkMyPortfolioSiteStack extends cdk.Stack {
-  constructor(scope: Construct, id: string, props?: cdk.StackProps) {
-    super(scope, id, props);
+    constructor(scope: Construct, id: string, props?: cdk.StackProps) {
+        super(scope, id, props);
+        //cloufront and S3
 
-    // The code that defines your stack goes here
+        const myBucket = new s3.Bucket(this, 'PortfolioBucket',{
+            bucketName: id == 'CdkMyPortfolioSiteStack' ? 'sambasten-portfolio-website' : undefined //avoids existing bucket name error for PR test stack
+        })
 
-    // example resource
-    // const queue = new sqs.Queue(this, 'CdkMyPortfolioSiteQueue', {
-    //   visibilityTimeout: cdk.Duration.seconds(300)
-    // });
-  }
+        cdk.Tags.of(myBucket).add('Name', 'Bucket for my portfolio site');
+
+        const cfDist = new cloudfront.Distribution(this, 'CFDistribution', {
+            defaultBehavior: {
+                origin: S3BucketOrigin.withOriginAccessControl(myBucket),
+                allowedMethods: cloudfront.AllowedMethods.ALLOW_ALL,
+                cachedMethods: cloudfront.AllowedMethods.ALLOW_GET_HEAD,
+                viewerProtocolPolicy: cloudfront.ViewerProtocolPolicy.REDIRECT_TO_HTTPS
+            },
+            defaultRootObject: 'index.html',
+            geoRestriction: cloudfront.GeoRestriction.allowlist('US', 'CA', 'GB', 'AU'),
+        })
+
+        cdk.Tags.of(cfDist).add('Name', 'CFDistribution my site');
+
+        new cdk.CfnOutput(this, 'CFDistributionDomain', {
+            value: cfDist.distributionDomainName
+        })
+    }
 }
