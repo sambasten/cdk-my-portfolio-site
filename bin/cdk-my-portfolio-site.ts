@@ -3,7 +3,9 @@ import * as cdk from 'aws-cdk-lib/core';
 import { CdkMyPortfolioSiteStack } from '../lib/cdk-my-portfolio-site-stack';
 
 const app = new cdk.App();
-new CdkMyPortfolioSiteStack(app, 'CdkMyPortfolioSiteStack', {
+const stackName = app.node.tryGetContext('stackName') ?? 'CdkMyPortfolioSiteStack';
+
+new CdkMyPortfolioSiteStack(app, stackName, {
   /* If you don't specify 'env', this stack will be environment-agnostic.
    * Account/Region-dependent features and context lookups will not work,
    * but a single synthesized template can be deployed anywhere. */
@@ -17,4 +19,5 @@ new CdkMyPortfolioSiteStack(app, 'CdkMyPortfolioSiteStack', {
   // env: { account: '123456789012', region: 'us-east-1' },
 
   /* For more information, see https://docs.aws.amazon.com/cdk/latest/guide/environments.html */
+
 });
