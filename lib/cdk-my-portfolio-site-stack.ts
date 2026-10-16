@@ -13,7 +13,7 @@ export class CdkMyPortfolioSiteStack extends cdk.Stack {
 
         //S3
         const myBucket = new s3.Bucket(this, 'PortfolioBucket',{
-            bucketName: 'sambasten-portfolio-website',
+            bucketName: 'akinwumisamuel.com',
             removalPolicy: cdk.RemovalPolicy.DESTROY,
             autoDeleteObjects: true
         })
