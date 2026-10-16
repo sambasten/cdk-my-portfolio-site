@@ -55,14 +55,10 @@ jobs:
                     })
 
 
-    deploy-site-to-s3:
+    deploy-site:
         #allow site deployment only on master
-        if: github.event_name == 'push' && github.repository.branches == 'master'
-        needs: deploy-stack
+        if: github.action.event == 'closed' || github.event_name == 'push' && github.repository.branches == 'master'
         runs-on: 'ubuntu-latest'
-        defaults:
-            run:
-                working-directory: ./mysite
         steps: 
             - name: Configure AWS credentials
               uses: aws-actions/configure-aws-credentials@v1
