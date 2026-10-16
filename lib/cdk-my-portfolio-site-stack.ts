@@ -67,7 +67,7 @@ export class CdkMyPortfolioSiteStack extends cdk.Stack {
         });
 
         new cdk.CfnOutput(this, 'Domain name', {
-            value: myHostedZone.zoneName
+            value: myHostedZone.zoneName //akinwumisamuel.com
         })
     }
 }
