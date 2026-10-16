@@ -428,6 +428,16 @@ h1, h2, h3, h4, h5,
 					position: relative;
 					// height: 650px;
 					z-index: -1;
+					// fade the photo's hard bottom edge into the black page bg
+					-webkit-mask-image: linear-gradient(to bottom, #000 75%, transparent 100%);
+					mask-image: linear-gradient(to bottom, #000 75%, transparent 100%);
+					// photos cut off at the sides too: also fade left/right edges
+					&.fade-sides{
+						-webkit-mask-image: linear-gradient(to bottom, #000 75%, transparent 100%), linear-gradient(to right, transparent 0%, #000 12%, #000 88%, transparent 100%);
+						mask-image: linear-gradient(to bottom, #000 75%, transparent 100%), linear-gradient(to right, transparent 0%, #000 12%, #000 88%, transparent 100%);
+						-webkit-mask-composite: source-in;
+						mask-composite: intersect;
+					}
 					.overlay{
 						position: absolute;
 						top: 0;
