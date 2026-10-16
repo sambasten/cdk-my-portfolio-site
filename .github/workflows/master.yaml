@@ -74,6 +74,6 @@ jobs:
 
             - name: Deploy site to S3
               run: |
-                aws s3 sync ./mysite/ s3://sambasten-portfolio-website --delete
+                aws s3 sync ./mysite/ s3://akinwumisamuel.com --delete
 
     
