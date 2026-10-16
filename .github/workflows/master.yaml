@@ -88,6 +88,7 @@ jobs:
 
     deploy-site-to-s3:
         if: github.event_name == 'push'
+        needs: deploy-stack
         runs-on: 'ubuntu-latest'
         defaults:
             run:
