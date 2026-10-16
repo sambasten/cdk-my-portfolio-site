@@ -27,7 +27,7 @@ export class CdkMyPortfolioSiteStack extends cdk.Stack {
         });
 
         // //create ACM SSL certificate
-        const mycert = new acm.Certificate(this, 'myCert', {
+        const mycert = new acm.Certificate(this, 'myCertv2', {
             domainName: myHostedZone.zoneName,
             validation: acm.CertificateValidation.fromDns(myHostedZone)
         });
