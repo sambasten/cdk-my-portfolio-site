@@ -9,6 +9,8 @@ on:
 permissions:
     contents: read
     pull-requests: write
+    security-events: write
+    models: read
 
 jobs:         
     deploy-stack:
@@ -25,6 +27,21 @@ jobs:
                   aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
                   aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
                   aws-region: us-east-1
+
+            - name: Security Scan with AI SSDLC security suite
+              uses: subzone/ssdlc-action@v1.3.0
+              with:
+                  github-token: ${{ github.token }}
+                  ai-provider: github
+                  severity-threshold: medium
+                  enable-iac-scan: true 
+                  enable-sast: true
+                  enable-sca: false
+                  fail-on-findings: false
+                  enable-secret-scan: true
+                  enable-ai-triage: true
+                  enable-ai-fix-suggestions: true
+                  sarif-upload: true
 
             - name: Set up node
               uses: actions/setup-node@v4
