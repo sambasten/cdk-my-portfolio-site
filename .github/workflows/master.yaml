@@ -30,12 +30,12 @@ jobs:
               with: 
                 node-version: '22'
 
-            - name: Validate CDK stack
+            - name: Validate CDK
               run: |
                   stackname="pr-${{github.event.pull_request.number}}-test-stack"
                   npm install -g aws-cdk
                   npm install
-                  cdk synth $stackname
+                  cdk synth
 
             - name: Deploy CDK stack
               run: |
@@ -87,7 +87,7 @@ jobs:
 
 
     deploy-site-to-s3:
-        if: github.event_name == 'push'
+        if: github.event_name == 'push' && github.repository.branches == 'master'
         needs: deploy-stack
         runs-on: 'ubuntu-latest'
         defaults:
