@@ -12,6 +12,7 @@ export class CdkMyPortfolioSiteStack extends cdk.Stack {
 
         const myBucket = new s3.Bucket(this, 'PortfolioBucket',{
             bucketName: id == 'CdkMyPortfolioSiteStack' ? 'sambasten-portfolio-website' : undefined ,//avoids existing bucket name error for PR test stack
+            removalPolicy: cdk.RemovalPolicy.DESTROY,
             autoDeleteObjects: true
         })
 
