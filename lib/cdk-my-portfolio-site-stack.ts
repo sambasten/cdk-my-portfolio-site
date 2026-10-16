@@ -55,7 +55,6 @@ export class CdkMyPortfolioSiteStack extends cdk.Stack {
 
         cdk.Tags.of(cfDist).add('Name', 'CFDistribution my site');
 
-
         //add A record type to hosted zone and target cloudfront
         const aRecord = new route53.ARecord(this, 'ipv4 akinwumisamuelCom', {
             zone: myHostedZone,
