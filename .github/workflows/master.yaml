@@ -70,7 +70,7 @@ jobs:
             
             - name: Check s3 bucket exists
               run: |
-                aws s3 ls sambasten-portfolio-website
+                aws s3 ls akinwumisamuel.com
 
             - name: Deploy site to S3
               run: |
