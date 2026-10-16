@@ -21,12 +21,12 @@ export class CdkMyPortfolioSiteStack extends cdk.Stack {
         cdk.Tags.of(myBucket).add('Name', 'Bucket for my portfolio site');
 
 
-        //route53
-        const myHostedZone = new route53.PublicHostedZone(this, 'MyHostedZone', {
-            zoneName: 'akinwumisamuel.com'
+        //look up created route53 hz
+        const myHostedZone = route53.PublicHostedZone.fromLookup(this, 'MyHostedZone', {
+            domainName: 'akinwumisamuel.com'
         });
 
-        //create ACM certificate
+        // //create ACM SSL certificate
         const mycert = new acm.Certificate(this, 'myCert', {
             domainName: myHostedZone.zoneName,
             validation: acm.CertificateValidation.fromDns(myHostedZone)
