@@ -1,1 +1,6 @@
-{}
+{
+  "hosted-zone:account=045283898962:domainName=akinwumisamuel.com:region=us-east-1": {
+    "Id": "/hostedzone/Z04980675D4YHJZ91YB",
+    "Name": "akinwumisamuel.com."
+  }
+}
