@@ -13,7 +13,7 @@ permissions:
 jobs:         
     deploy-stack:
         #force stack deployment only when PR is closed
-        if: github.event.action != 'closed'
+        if: github.event.action != 'closed' && github.event_name != 'push'
         runs-on: ubuntu-latest
         steps:
             - name: Checkout
