@@ -1,69 +1,19 @@
 name: 'Deploy static site to s3'
 description: 'deploy and test only cloudformation stacks on PR. Push mysite directly to s3 otherwise'
 on:
-    push:
-        branches:
-          - master
-        paths: 
-          - 'mysite/**'
     pull_request:
         types: [opened, synchronize, closed]
+    push:
+        branches:
+            - master
 permissions:
     contents: read
     pull-requests: write
 
-jobs:
-    deploy-and-test-stack:
-        if: github.event_name == 'pull_request' && github.event.action != 'closed'
-        runs-on: 'ubuntu-latest'
-        steps:
-            - name: Checkout
-              uses: actions/checkout@v2
-            
-            - name: Configure AWS credentials
-              uses: aws-actions/configure-aws-credentials@v1
-              with:
-                  aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-                  aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-                  aws-region: us-east-2 
-
-            - name: Set up node
-              uses: actions/setup-node@v4
-              with: 
-                node-version: '22'
-
-            - name: Validate CDK stack
-              run: |
-                  stackname='pr-${{github.event.pull_request.number}}-test-stack'
-                  npm install -g aws-cdk
-                  npm install
-                  cdk synth -c stackName=$stackname
-
-            - name: Deploy CDK stack
-              run: |
-                  stackname='pr-${{github.event.pull_request.number}}-test-stack'
-                  cdk deploy -c stackName=$stackname --require-approval never
-    
-            - name: Comment on PR
-              uses: actions/github-script@v6
-              with:
-                script: |
-                  github.rest.issues.createComment({
-                  issue_number: context.issue.number,
-                  owner: context.repo.owner,
-                  repo: context.repo.repo,
-                  body: 'CDK stack good to go, merge approved'
-                  })
-
-            - name: Destroy Stack
-              if: always()
-              run: |
-                  stackname='pr-${{github.event.pull_request.number}}-test-stack'
-                  cdk destroy -c stackName=$stackname --force
-              
-
-    deploy-site:
-        if: github.event_name == 'push'
+jobs:         
+    deploy-stack:
+        #force stack deployment only when PR is closed
+        if: github.event.action != 'closed'
         runs-on: ubuntu-latest
         steps:
             - name: Checkout
@@ -76,8 +26,53 @@ jobs:
                   aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
                   aws-region: us-east-2
 
-            - name: Deploy static content to S3
+            - name: Set up node
+              uses: actions/setup-node@v4
+              with: 
+                node-version: '22'
+            
+            - name: Validate Stack 
               run: |
-                  aws s3 sync ./mysite s3://sambasten-portfolio-website --delete
+                npm install -g aws-cdk
+                npm install
+                cdk synth CdkMyPortfolioSiteStack
+
+            - name: Deploy Stack
+              run: |
+                  npm install -g aws-cdk
+                  npm install
+                  cdk deploy CdkMyPortfolioSiteStack --require-approval never
+
+            - name: Comment on PR
+              uses: actions/github-script@v6
+              with:
+                  script: |
+                    github.rest.issues.createComment({
+                    issue_number: context.issue.number,
+                    owner: context.repo.owner,
+                    repo: context.repo.repo,
+                    body: 'CDK stack good to go, you can merge!'
+                    })
+
+
+    deploy-site-to-s3:
+        #allow site deployment only on master
+        if: github.event_name == 'push' && github.repository.branches == 'master'
+        needs: deploy-stack
+        runs-on: 'ubuntu-latest'
+        defaults:
+            run:
+                working-directory: ./mysite
+        steps: 
+            - name: Configure AWS credentials
+              uses: aws-actions/configure-aws-credentials@v1
+              with:
+                  aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+                  aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+                  aws-region: us-east-2
+
+            - name: Deploy site to S3
+              run: |
+                aws s3 sync ./mysite/ s3://sambasten-portfolio-website --delete
 
     
