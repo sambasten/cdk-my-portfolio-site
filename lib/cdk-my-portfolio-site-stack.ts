@@ -49,7 +49,7 @@ export class CdkMyPortfolioSiteStack extends cdk.Stack {
                 geoRestriction: cloudfront.GeoRestriction.allowlist('US', 'CA', 'GB', 'AU'),
                 certificate: mycert,
                 domainNames: [
-                    myHostedZone.zoneName //akinwumisamuel.com
+                    myHostedZone.zoneName //akinwumisamuel.com 
                 ]
             })
 
