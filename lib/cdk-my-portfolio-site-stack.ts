@@ -16,8 +16,6 @@ export class CdkMyPortfolioSiteStack extends cdk.Stack {
             bucketName: 'akinwumisamuel.com',
             removalPolicy: cdk.RemovalPolicy.DESTROY,
             autoDeleteObjects: true,
-            websiteIndexDocument: 'index.html',
-            websiteErrorDocument: 'index.html'
         })
 
         cdk.Tags.of(myBucket).add('Name', 'Bucket for my portfolio site');
@@ -47,6 +45,13 @@ export class CdkMyPortfolioSiteStack extends cdk.Stack {
                                 maxTtl: cdk.Duration.seconds(3600)
                 }),
             },
+            errorResponses: [
+                {
+                    httpStatus: 404,
+                    responseHttpStatus: 200,
+                    responsePagePath: '/index.html'
+                }
+            ],
                 defaultRootObject: 'index.html',
                 geoRestriction: cloudfront.GeoRestriction.allowlist('US', 'CA', 'GB', 'AU'),
                 certificate: mycert,
