@@ -15,7 +15,9 @@ export class CdkMyPortfolioSiteStack extends cdk.Stack {
         const myBucket = new s3.Bucket(this, 'PortfolioBucket',{
             bucketName: 'akinwumisamuel.com',
             removalPolicy: cdk.RemovalPolicy.DESTROY,
-            autoDeleteObjects: true
+            autoDeleteObjects: true,
+            websiteIndexDocument: 'index.html',
+            websiteErrorDocument: 'index.html'
         })
 
         cdk.Tags.of(myBucket).add('Name', 'Bucket for my portfolio site');
