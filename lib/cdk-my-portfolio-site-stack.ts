@@ -49,12 +49,12 @@ export class CdkMyPortfolioSiteStack extends cdk.Stack {
                 {
                     httpStatus: 404,
                     responseHttpStatus: 404,
-                    responsePagePath: 'error.html'
+                    responsePagePath: '/error.html'
                 },
                 {
                     httpStatus: 403,
                     responseHttpStatus: 404,
-                    responsePagePath: 'error.html'
+                    responsePagePath: '/error.html'
                 }
             ],
                 defaultRootObject: 'index.html',
