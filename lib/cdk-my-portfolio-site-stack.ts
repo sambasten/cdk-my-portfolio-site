@@ -29,6 +29,7 @@ export class CdkMyPortfolioSiteStack extends cdk.Stack {
         // //create ACM SSL certificate
         const mycert = new acm.Certificate(this, 'myCertv2', {
             domainName: myHostedZone.zoneName,
+            subjectAlternativeNames: ['*.akinwumisamuel.com'],//one level deep wildcard
             validation: acm.CertificateValidation.fromDns(myHostedZone)
         });
 
@@ -58,22 +59,34 @@ export class CdkMyPortfolioSiteStack extends cdk.Stack {
                 }
             ],
                 defaultRootObject: 'index.html',
-                geoRestriction: cloudfront.GeoRestriction.allowlist('US', 'CA', 'GB', 'AU'),
                 certificate: mycert,
                 domainNames: [
-                    myHostedZone.zoneName //akinwumisamuel.com 
+                    myHostedZone.zoneName, 'www.' + myHostedZone.zoneName,
                 ]
             })
 
         cdk.Tags.of(cfDist).add('Name', 'CFDistribution my site');
 
         //add A record type to hosted zone and target cloudfront
+        //root
         const aRecord = new route53.ARecord(this, 'Arecord akinwumisamuelCom', {
             zone: myHostedZone,
             target: route53.RecordTarget.fromAlias(new targets.CloudFrontTarget(cfDist))
         });
 
-        const aaaaRecord = new route53.AaaaRecord(this, 'A4 record akinwumisamuelCom', {
+        const a4Record = new route53.AaaaRecord(this, 'A4record akinwumisamuelCom', {
+            zone: myHostedZone,
+            target: route53.RecordTarget.fromAlias(new targets.CloudFrontTarget(cfDist))
+        });
+        //www
+        const wwwaRecord = new route53.ARecord(this, 'Arecord wwwakinwumisamuelCom', {
+            recordName: 'www',
+            zone: myHostedZone,
+            target: route53.RecordTarget.fromAlias(new targets.CloudFrontTarget(cfDist))
+        });
+
+        const wwwa4Record = new route53.AaaaRecord(this, 'A4record wwwakinwumisamuelCom', {
+            recordName: 'www',
             zone: myHostedZone,
             target: route53.RecordTarget.fromAlias(new targets.CloudFrontTarget(cfDist))
         });
