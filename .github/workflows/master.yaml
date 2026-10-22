@@ -20,7 +20,7 @@ jobs:
         runs-on: ubuntu-latest
         steps:
             - name: Checkout
-              uses: actions/checkout@v2
+              uses: actions/checkout@v4
 
             # - name: Configure AWS credentials
             #   uses: aws-actions/configure-aws-credentials@v1
@@ -30,7 +30,7 @@ jobs:
             #       aws-region: us-east-1
 
             - name: Configure AWS credentials
-              uses: aws-actions/configure-aws-credentials@v1
+              uses: aws-actions/configure-aws-credentials@v4
               with:
                   role-to-assume: 'arn:aws:iam::045283898962:role/GithubIdentityProviderRole'
                   role-duration-seconds: 3600
