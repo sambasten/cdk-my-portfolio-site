@@ -13,13 +13,11 @@ export class CdkMyPortfolioSiteStack extends cdk.Stack {
     constructor(scope: Construct, id: string, props?: cdk.StackProps) {
         super(scope, id, props);
 
-        //Github Identity provider added n console
-
-        //Create IAM role for Github identity provider in this repo
+        //Create IAM role for Github identity provider in this repo and add github identity provider arn
         const githubIdentityProviderRole = new iam.Role(this, 'GithubIdentityProviderRole', {
             assumedBy: new iam.WebIdentityPrincipal('arn:aws:iam::045283898962:oidc-provider/token.actions.githubusercontent.com',
                 {
-                    StringEquals: {
+                    StringEquals: { 
                         'token.actions.githubusercontent.com:aud': 'sts.amazonaws.com',
                     },
                     StringLike: {
@@ -39,7 +37,7 @@ export class CdkMyPortfolioSiteStack extends cdk.Stack {
                         }),
                         //deploy-s3 job
                         new iam.PolicyStatement({
-                            actions: ['sts:ListBucket'],
+                            actions: ['s3:ListBucket'],
                             resources: ['arn:aws:s3:::akinwumisamuel.com'],
                         }),
                         new iam.PolicyStatement({
