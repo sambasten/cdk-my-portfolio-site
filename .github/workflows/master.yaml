@@ -11,6 +11,7 @@ permissions:
     pull-requests: write
     security-events: write
     models: read
+    id-token: write #required for Github OIDC
 
 jobs:         
     deploy-stack:
@@ -27,6 +28,13 @@ jobs:
                   aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
                   aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
                   aws-region: us-east-1
+
+            # - name: Configure AWS credentials
+            #   uses: aws-actions/configure-aws-credentials@v1
+            #   with:
+            #       role-to-assume: 'arn:aws:iam::045283898962:role/GithubIdentityProviderRole'
+            #       role-duration-seconds: 3600
+            #       aws-region: 'us-east-1'
 
             - name: Security Scan with AI SSDLC security suite
               uses: subzone/ssdlc-action@v1.3.0
@@ -46,7 +54,7 @@ jobs:
             - name: Set up node
               uses: actions/setup-node@v4
               with: 
-                node-version: '22'
+                node-version: '22.x'
             
             - name: Validate CDK 
               run: |
