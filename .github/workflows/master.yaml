@@ -15,7 +15,7 @@ permissions:
 
 jobs:         
     deploy-stack:
-        #force stack deployment only when PR is closed
+        #force stack deployment only when PR is open & merged
         if: github.event_name == 'pull_request' && github.event.action != 'closed'
         runs-on: ubuntu-latest
         steps:
