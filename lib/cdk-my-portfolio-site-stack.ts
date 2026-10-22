@@ -85,6 +85,7 @@ export class CdkMyPortfolioSiteStack extends cdk.Stack {
                                 minTtl: cdk.Duration.seconds(0),
                                 maxTtl: cdk.Duration.seconds(3600)
                 }),
+                responseHeadersPolicy: cloudfront.ResponseHeadersPolicy.SECURITY_HEADERS,
             },
             errorResponses: [
                 {
