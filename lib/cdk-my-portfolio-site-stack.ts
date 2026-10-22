@@ -48,7 +48,6 @@ export class CdkMyPortfolioSiteStack extends cdk.Stack {
                 })
             }
         });
-
         cdk.Tags.of(githubIdentityProviderRole).add('Name', 'GithubIdentityProviderRole');
 
         //S3
@@ -57,7 +56,6 @@ export class CdkMyPortfolioSiteStack extends cdk.Stack {
             removalPolicy: cdk.RemovalPolicy.DESTROY,
             autoDeleteObjects: true,
         })
-
         cdk.Tags.of(myBucket).add('Name', 'Bucket for my portfolio site');
 
 
@@ -73,7 +71,6 @@ export class CdkMyPortfolioSiteStack extends cdk.Stack {
             subjectAlternativeNames: ['*.akinwumisamuel.com'],//one level deep wildcard
             validation: acm.CertificateValidation.fromDns(myHostedZone)
         });
-
         cdk.Tags.of(mycert).add('Name', 'myCertv2');
 
         //cloudfront distribution
@@ -107,7 +104,6 @@ export class CdkMyPortfolioSiteStack extends cdk.Stack {
                     myHostedZone.zoneName, 'www.' + myHostedZone.zoneName,
                 ]
             })
-
         cdk.Tags.of(cfDist).add('Name', 'CFDistribution for my portfoliosite');
 
         //add A record type to hosted zone and target cloudfront
