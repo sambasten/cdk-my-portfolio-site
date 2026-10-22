@@ -21,7 +21,7 @@ export class CdkMyPortfolioSiteStack extends cdk.Stack {
                         'token.actions.githubusercontent.com:aud': 'sts.amazonaws.com',
                     },
                     StringLike: {
-                        'token.actions.githubusercontent.com:sub': 'repo:sambasten/cdk-my-portfolio-site:*'
+                        'token.actions.githubusercontent.com:sub': 'repo:sambasten@20877484/cdk-my-portfolio-site@1421132550:*',
                     }
                 }
             ),
