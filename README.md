@@ -28,9 +28,9 @@ A static portfolio site (`mysite/`) served from a private S3 bucket through Clou
 ## What broke and how I fixed it
 **The OIDC role wouldn't let GitHub Actions in.** I wrote the trust policy with the usual subject condition, `repo:sambasten/cdk-my-portfolio-site:*`, but the workflow kept failing to assume the role. To keep shipping, I temporarily rolled the workflow back to access keys while I worked out why.
 
-The cause was that the `sub` claim in the token GitHub sent didn't match my pattern. My repo's token includes the owner and repository IDs, not just the names: `repo:sambasten@<owner-id>/cdk-my-portfolio-site@<repo-id>:*`. Once I updated the `StringLike` condition to that format, role assumption worked. I switched the workflow back to OIDC and deleted the access keys.
+Going through the GitHub docs showed why. GitHub changed the default OIDC subject claim: since July 2026, new repositories get a stricter `sub` that includes the immutable owner and repository IDs, not just the names. The change stops a recycled repo name from inheriting an old trust policy. My token's subject was really `repo:sambasten@<owner-id>/cdk-my-portfolio-site@<repo-id>:*`. Once I updated the `StringLike` condition to that format, role assumption worked. I switched the workflow back to OIDC and deleted the access keys.
 
-The takeaway: when an OIDC trust fails, check the claims GitHub actually sends instead of copying the subject format from a tutorial.
+The takeaway: when OIDC trust fails, go to GitHub's docs and changelog for the current claim format before touching the trust policy.
 
 Smaller fixes along the way:
 - CloudFront error pages need a leading slash (`/error.html`, not `error.html`).
