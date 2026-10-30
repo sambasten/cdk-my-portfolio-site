@@ -2,18 +2,7 @@
 
 **Live:** [akinwumisamuel.com](https://akinwumisamuel.com)
 
-```mermaid
-flowchart LR
-    User((Visitor)) -->|akinwumisamuel.com / www| R53[Route 53<br/>A + AAAA alias records]
-    R53 --> CF[CloudFront<br/>HTTPS · security headers · 2 min cache]
-    ACM[ACM certificate<br/>apex + *.akinwumisamuel.com] -.-> CF
-    CF -->|Origin Access Control| S3[(Private S3 bucket<br/>index.html · error.html)]
-
-    Dev[git push] --> GH[GitHub Actions]
-    GH -->|OIDC, no stored keys| IAM[IAM role]
-    IAM -->|PR: security scan, cdk synth + deploy| CFN[CloudFormation<br/>CDK stack]
-    IAM -->|merge to master: aws s3 sync| S3
-```
+![Architecture](myportfoliosite.png)
 
 ## The problem
 I needed a portfolio site that I own end to end: my own domain, HTTPS, fast everywhere, and close to free to run. Clicking all of that together in the AWS console works once but can't be repeated or reviewed. 
