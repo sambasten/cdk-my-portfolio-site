@@ -1,14 +1,14 @@
-*.js
-!jest.config.js
-!mysite/**/*.js
-*.d.ts
-node_modules
-
-# CDK asset staging directory
-.cdk.staging
-cdk.out
+# CDK app (infra/): dependencies, compiled output, synth output, local env
+infra/node_modules/
+infra/**/*.js
+!infra/jest.config.js
+infra/**/*.d.ts
+infra/.cdk.staging/
+infra/cdk.out/
+infra/.env
+infra/.env.*
+!infra/.env.example
 
 # OS / editor files
 .DS_Store
 .vscode/
-
