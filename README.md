@@ -2,13 +2,13 @@
 
 **Live:** [akinwumisamuel.com](https://akinwumisamuel.com)
 
-![Architecture](myportfoliosite.png)
+![Architecture](infra/myportfoliosite.png)
 
 ## The problem
 I needed a portfolio site that I own end to end: my own domain, HTTPS, fast everywhere, and close to free to run. Clicking all of that together in the AWS console works once but can't be repeated or reviewed. 
 
 ## What I built
-A static portfolio site (`mysite/`) served from a private S3 bucket through CloudFront, with every piece of infrastructure defined in one AWS CDK stack written in TypeScript (`lib/cdk-my-portfolio-site-stack.ts`).
+A static portfolio site (`mysite/`) served from a private S3 bucket through CloudFront, with every piece of infrastructure defined in one AWS CDK stack written in TypeScript (`infra/lib/cdk-my-portfolio-site-stack.ts`). The CDK app, its `package.json` and tests all live under `infra/`; the site itself has no build step or dependencies.
 
 - **S3** stores the site files. The bucket isn't public; only CloudFront can read it.
 - **CloudFront** serves the site over HTTPS (HTTP redirects to HTTPS), adds AWS's managed security-headers policy, caches for 2 minutes by default, and returns a custom `error.html` for 403/404s.
@@ -48,7 +48,7 @@ This is my personal site, so nobody needs to deploy it except me, and I never de
 | I change... | I do... | What happens |
 |---|---|---|
 | Site content (`mysite/`) | Merge to `master` | GitHub Actions syncs `mysite/` to S3. CloudFront serves the new version within about 2 minutes. |
-| Infrastructure (`lib/`) | Open a PR from `dev` | GitHub Actions runs the security scan, then `cdk synth` and `cdk deploy`, and comments on the PR when it's safe to merge. |
+| Infrastructure (`infra/`) | Open a PR from `dev` | GitHub Actions runs the security scan, then `cdk synth` and `cdk deploy`, and comments on the PR when it's safe to merge. |
 
 To preview the site locally before pushing, run:
 
@@ -60,12 +60,13 @@ python3 -m http.server 8000   # then open http://localhost:8000
 To check infrastructure changes locally (needs AWS credentials for my account):
 
 ```bash
+cd infra
 npm install
 npx cdk diff      # what would change in the deployed stack
 npm test          # Jest tests
 ```
 
-**Want to reuse this setup?** Swap the domain, the GitHub repo in the OIDC trust condition and the account ID in `lib/cdk-my-portfolio-site-stack.ts` and `.github/workflows/master.yaml`. Then run `npx cdk bootstrap` and `npx cdk deploy` once in `us-east-1` (CloudFront only accepts ACM certificates from that region).
+**Want to reuse this setup?** Swap the domain, the GitHub repo in the OIDC trust condition and the account ID in `infra/lib/cdk-my-portfolio-site-stack.ts` and `.github/workflows/master.yaml`. Then, from `infra/`, run `npx cdk bootstrap` and `npx cdk deploy` once in `us-east-1` (CloudFront only accepts ACM certificates from that region).
 
 **Walkthrough:** [
     Loom link: https://www.loom.com/share/16908a40e9ef4278a26f18adb4e3e7f0 ,

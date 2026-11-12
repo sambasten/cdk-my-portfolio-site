@@ -1,121 +1,124 @@
-# Portfolio Site Redesign Spec
+# Portfolio Site Spec
 
-**Status: Built on 2026-11-10.** The redesign described below has been implemented in `mysite/` (new `css/site.css`, `js/site.js`, rewritten `index.html` and `error.html`, WebP image variants, template assets removed). Keep this file as the design reference for future changes.
+**Status: Redesign built on 2026-11-10; repo restructured on 2026-11-11.** The redesign described below is live in `mysite/`. The old template site survives only on the `dev` branch. Keep this file as the design and process reference for future changes.
+
+## Repository layout
+
+- `mysite/` — the static site. Dependency-free HTML, CSS and JS; synced as-is to S3 on every push to `master`, so nothing goes in here that should not be public (no screenshots, originals, scratch files or notes).
+- `infra/` — the AWS CDK app (`bin/`, `lib/`, `test/`, `cdk.json`, `cdk.context.json`, `package.json`, `tsconfig.json`, `jest.config.js`, `.npmignore`) plus the architecture diagram (`myportfoliosite.png`, `.excalidraw`). `npm install`, `npm test` and `cdk` all run from inside `infra/`. `infra/.env` holds local secrets and is git-ignored; `infra/.env.example` is the committed template.
+- `.github/workflows/master.yaml` — the pipelines. Must stay at the repo root; its CDK steps use `working-directory: infra`. PRs synth and deploy the stack; pushes to `master` sync `mysite/` to S3.
+- Root — `README.md`, `.gitignore`, `CLAUDE.md`, `.claude/` and `.vscode/` (ignored) only.
 
 ## Scope guard
 
-- All changes are confined to `mysite/`.
-- Never edit `bin/`, `lib/`, `test/`, `cdk.json`, `cdk.context.json`, `package.json`, `package-lock.json`, `tsconfig.json`, `jest.config.js`, `.github/` or any other root-level CDK file. These are the infrastructure and are enforced as deny rules in `.claude/settings.json`.
+- Site work is confined to `mysite/`. Repo housekeeping (`README.md`, `.gitignore`, `.claude/`, `CLAUDE.md`) is allowed when asked.
+- Never edit anything under `infra/` or `.github/`. These are the infrastructure and are enforced as deny rules in `.claude/settings.json`.
 - Never run `cdk`, `npx cdk` or `aws` commands. Deployment happens automatically when `master` is pushed (`aws s3 sync ./mysite/ s3://akinwumisamuel.com --delete --exclude "scss/*"`), so every change under `mysite/` is a production change once merged.
+- Never read, print or commit `infra/.env`.
 
 ## Goal (user's brief, verbatim)
 
 > Improve UI/UX, visuals and design for this website, better than Opus 5.5. Add some animations and update image quality.
 
-## Current state
+## Current state (as built)
 
-**Stack.** Static HTML, Bootstrap 4 (inlined in `css/style.css`, about 9.7k lines), jQuery 3.2.1, Owl carousel, AOS, animate.css, stellar/scrollax parallax, waypoints, animateNumber. SCSS source lives in `mysite/scss/` and was compiled with Prepros; the served file is `mysite/css/style.css`.
+**Stack.** Hand-written HTML, one stylesheet (`mysite/css/site.css`) and one script (`mysite/js/site.js`). No frameworks, no build step, no npm. Fonts: Poppins (body) and Sora (headings) from the Google Fonts `css2` API with `display=swap`. Favicon is an inline SVG data URI ("SA" on an amber gradient).
 
-**Theme.** Dark. Body background `#000`, body text `#999`, primary `#ffbd39` (amber), secondary `#a0f669`, dark shade `#232931`. Font is Poppins (100–900) loaded through the legacy Google Fonts `css?family=` URL.
+**Files.**
+- `mysite/index.html`, `mysite/error.html` (CloudFront serves `error.html` for 403 and 404)
+- `mysite/css/site.css`, `mysite/js/site.js`
+- `mysite/AKINWUMI+SamuelResume.pdf` (Download CV link)
+- `mysite/images/` (see below)
 
 **Sections in `index.html`, in order.**
-1. Navbar `#ftco-navbar`
-2. Hero `#home-section`: Owl carousel, two slides ("I'm Sam / A Software & Cloud Engineer" and "I'm a cloud security engineer based in Toronto"), buttons "Hire me" and "My works"
-3. About `#about-section`: portrait, info list, "30 web apps secured" counter, Download CV
-4. Resume `#resume-section`
-5. Services `#services-section`: six cards
-6. Skills `#skills-section`: six progress bars
-7. Projects `#projects-section`: six projects, all links `href="#"`
-8. Certifications `#blog-section`: three cards
-9. Counter strip `#section-counter`
-10. "Hire me" banner on `bg_1.jpg`
-11. Contact `#contact-section`: address, email, website, no form
-12. Footer and full-page `#ftco-loader`
+1. `#site-nav` sticky glass navbar, "SA" brand, mobile drawer
+2. `#home` hero: portrait `<picture>`, rotating role text, two CTAs
+3. `#about`
+4. `#experience` (resume)
+5. `#services`
+6. `#skills` (animated meters)
+7. `#projects` (six cards)
+8. `#certifications`
+9. "Hire me" banner on `banner-*.webp`
+10. `#contact`, footer
 
-**Known defects to fix.**
-- Navbar brand renders the literal text `&am`.
-- All six project links are dead (`href="#"`).
-- `js/google-map.js` is shipped but never referenced.
-- `prepros-6.config` is deployed publicly.
-- The full-page loader delays first paint.
-- Images have no responsive variants. `project-6.png` is 2988×1454 (334 KB). Hero and About portraits are 1000×1194 JPGs used as CSS backgrounds, so they cannot have alt text or `srcset`.
+**Images in `mysite/images/`.** Naming scheme is `<name>-<width>.webp` with the original JPG/PNG kept as the `<img src>` fallback inside `<picture>`.
 
-**Images in `mysite/images/`.**
-
-| File | Bytes | Dimensions | Used for |
+| Asset | WebP widths | Fallback | Used for |
 |---|---|---|---|
-| asternsam-black.jpg | 75,035 | 1000×1194 | hero slide 1, About |
-| asmilesam-black.jpg | 106,275 | 1000×1194 | hero slide 2 |
-| bg_1.jpg | 153,856 | 2000×1155 | "Hire me" background |
-| aws-cert.jpg | 24,100 | 600×375 | certification |
-| azure-ai.jpg | 100,162 | 1600×1000 | certification |
-| project-1.png | 160,201 | 1345×779 | project |
-| project-2.jpg | 101,536 | 1000×750 | project |
-| project-3.jpg | 94,638 | 1000×667 | project |
-| project-4.png | 146,156 | 1313×776 | project |
-| project-5.jpg | 103,196 | 1000×667 | project |
-| project-6.png | 333,525 | 2988×1454 | project |
-| image_1.jpg, image_2.jpg, image_3.jpg, person_1.jpg, loc.png | | | template leftovers, check usage before deleting |
+| portrait-a | 500, 800, 1000 | asternsam-black.jpg (1000×1194) | hero, About |
+| portrait-b | 500, 800, 1000 | asmilesam-black.jpg (1000×1194) | hero rotation |
+| banner | 1280, 2000 | bg_1.jpg (2000×1155) | "Hire me" banner |
+| project-1 | 640, 960 | project-1.png (1345×779) | project card |
+| project-2 | 640, 960 | project-2.jpg (1000×750) | project card |
+| project-3 | 640, 960 | project-3.jpg (1000×667) | project card |
+| project-4 | 640, 960 | project-4.png (1313×776) | project card |
+| project-5 | 640, 960 | project-5.jpg (1000×667) | project card |
+| project-6 | 640, 960, 1280 | none (original 2988×1454 PNG was dropped; `src` is the 1280 WebP) | project card |
 
-## Design direction
+Known exception: project-6 has no JPG/PNG fallback. Acceptable because every supported browser renders WebP, but add one if the original is ever recovered.
 
-Keep the dark, amber-accent identity but modernize it.
+Removed during the redesign: Bootstrap, jQuery, Owl, AOS, animate.css, waypoints, `scss/`, `css/style.css`, `js/main.js`, `js/google-map.js`, `prepros-6.config`, the certification JPGs and all template images.
 
-- **Palette.** Near-black layered surfaces (`#0b0d10` base, `#13161b` and `#1b1f26` for elevation), amber gradient accent (`#ffbd39` to `#ff8c42`), body text lifted to `#c9ccd1` for WCAG AA contrast, muted text `#8b9099`. Subtle glass effect on cards (`backdrop-filter: blur`, 1px translucent border).
-- **Type.** Fluid scale with `clamp()`. Variable Poppins via the Google Fonts `css2` API with `font-display: swap`, optionally paired with a display face (Sora or Space Grotesk) for headings.
+## Design direction (implemented)
+
+Dark, amber-accent identity, modernized.
+
+- **Palette.** Near-black layered surfaces (`#0b0d10` base, `#13161b` and `#1b1f26` for elevation), amber gradient accent (`#ffbd39` to `#ff8c42`), body text `#c9ccd1` for WCAG AA contrast, muted text `#8b9099`. Subtle glass effect on cards (`backdrop-filter: blur`, 1px translucent border). All colours are CSS custom properties in `site.css`; change them there, not inline.
+- **Type.** Fluid scale with `clamp()`. Poppins for body, Sora for headings.
 - **Spacing.** 8-pt scale, consistent section padding, max content width around 1200px.
-- **Hero.** Replace the Owl carousel with a single composed hero: portrait with a gradient mask, animated gradient blob or grain background, staggered text reveal, magnetic CTA buttons, scroll cue. Keep both taglines through a rotating word effect instead of slides.
-- **Cards** (Services, Projects, Certifications). Hover lift, cursor-tracked border glow, image zoom on hover. Projects get real links or an explicit "coming soon" state.
-- **Skills.** Replace flat progress bars with animated radial or segmented meters that fill on scroll.
-- **Navigation.** Sticky glass navbar that shrinks on scroll, active-section highlight, mobile drawer with staggered item reveal. Brand becomes "SA" or "Samuel Akinwumi".
+- **Hero.** Single composed hero: portrait with a gradient mask, animated gradient background, staggered text reveal, rotating role word, scroll cue.
+- **Cards** (Services, Projects, Certifications). Hover lift, cursor-tracked border glow, image zoom on hover. Project links must be real URLs or an explicit "coming soon" state, never `href="#"`.
+- **Skills.** Animated meters that fill on scroll.
+- **Navigation.** Sticky glass navbar that shrinks on scroll, active-section highlight, mobile drawer with staggered item reveal.
 - **Micro-interactions.** Button shine, link underline slide, visible `:focus-visible` rings, smooth scroll, back-to-top button.
-- **Loader.** Remove the blocking spinner; use a short page-load reveal.
 - **Accessibility.** Semantic landmarks, alt text on every image, keyboard-reachable everything, `prefers-reduced-motion` disables non-essential motion.
-- **Performance.** No new heavy libraries. Prefer CSS animations and IntersectionObserver. Drop unused assets (`google-map.js`, Owl carousel if the hero no longer needs it, template images not referenced). Target Lighthouse mobile ≥ 90 in all four categories.
+- **Performance.** No libraries. CSS animations and IntersectionObserver only. No unused assets.
 
 ## Animations
 
-All gated behind `@media (prefers-reduced-motion: no-preference)`. Shared easing `cubic-bezier(0.22, 1, 0.36, 1)`, durations 200–600 ms.
+All gated behind `@media (prefers-reduced-motion: no-preference)` in CSS and a matching `matchMedia` check in JS. Shared easing `cubic-bezier(0.22, 1, 0.36, 1)`, durations 200–600 ms. New motion must use the same tokens.
 
-1. Hero staggered fade-up for subheading, h1, h2 and CTAs (CSS keyframes, 80 ms stagger).
-2. Rotating role text ("Software & Cloud Engineer" / "Cloud Security Engineer") with a soft blur transition.
-3. Scroll-reveal for every section via IntersectionObserver, replacing waypoints and `.ftco-animate`.
-4. Counter count-up on reveal (reuse `animateNumber` or a small vanilla function).
+1. Hero staggered fade-up for subheading, h1, h2 and CTAs (80 ms stagger).
+2. Rotating role text with a soft blur transition.
+3. Scroll-reveal for every section via IntersectionObserver.
+4. Counter count-up on reveal.
 5. Skill meters fill on reveal.
 6. Card hover lift plus cursor-tracked glow (CSS custom properties updated on `mousemove`).
 7. Navbar shrink and blur on scroll.
-8. Subtle animated gradient or noise in the hero and "Hire me" banner backgrounds.
+8. Subtle animated gradient in the hero and "Hire me" banner backgrounds.
 
-## Image quality
+## Image workflow
 
-- Resize to the sizes actually displayed and export WebP with JPG/PNG fallback via `<picture>`. Portraits at 800, 1200 and 1600 px wide. Project images at 640, 960 and 1280 px. `project-6.png` scaled down from 2988 px. `bg_1.jpg` as a compressed WebP at or under 150 KB.
-- Add `srcset` and `sizes`, explicit `width` and `height`, `loading="lazy"` below the fold, and `fetchpriority="high"` on the hero portrait.
-- Convert the CSS `background-image` portraits to real `<img>` elements with `object-fit: cover` so they get alt text and responsive sources.
-- Apply light sharpening and denoise after resizing.
-- Upscaling the existing JPGs does not count as higher quality. If higher-resolution originals are available, ask the user for them and use those.
-- Tools: `sips` (built into macOS), `cwebp`, or ImageMagick `magick` if installed.
-
-## Files expected to change when built
-
-- `mysite/index.html`, `mysite/error.html`
-- `mysite/scss/style.scss` recompiled to `mysite/css/style.css`, or a new `mysite/css/theme.css` loaded after `style.css` if Prepros is unavailable
-- `mysite/js/main.js` (slimmed down, IntersectionObserver reveals added)
-- `mysite/images/` (optimized variants added, unused template images removed)
+- Resize to the sizes actually displayed and export WebP with the JPG/PNG original as fallback inside `<picture>`. Portraits at 500, 800 and 1000 px wide. Project images at 640, 960 and (if the source allows) 1280 px. Banner at 1280 and 2000 px.
+- Every `<img>` has `srcset`/`sizes` via its `<source>`, explicit `width` and `height`, `loading="lazy"` below the fold, `decoding="async"`, and `fetchpriority="high"` on the hero portrait only.
+- Tools on this Mac: `sips` for resizing, then `cwebp -q 82 -sharp_yuv -m 6`. ImageMagick is not installed.
+- Upscaling does not count as higher quality. If a higher-resolution original is needed, ask the user for it.
+- Originals and intermediates never land in `mysite/`; work in the scratchpad and copy only the final files in.
 
 ## Quality bar
 
-"Better than Opus 5.5" means:
 - Every section has a deliberate visual hierarchy.
-- No template leftovers: no `&am`, no dead links, no unused scripts or images.
+- No template leftovers, dead links, unused scripts or images.
 - Zero console errors and no 404s.
-- Lighthouse mobile ≥ 90 in Performance, Accessibility, Best Practices and SEO.
+- Lighthouse mobile ≥ 90 in Performance, Accessibility, Best Practices and SEO. This is the target; Claude cannot run Lighthouse here, so the user measures it in Chrome DevTools when it matters.
 - A cohesive motion system (shared easing and durations) rather than scattered effects.
+
+## Verification
+
+There is no check script. Verify with headless Chrome driven over the DevTools Protocol from a Node 22 script kept in the scratchpad (never in the repo):
+
+1. Serve the site: `cd mysite && python3 -m http.server 8000`.
+2. Load `http://localhost:8000/` and `/error.html`; fail on any console error or non-200 network response.
+3. Screenshot at 1440, 768 and 390 px wide, and once more at 390 px with `prefers-reduced-motion: reduce` emulated.
+4. Review the screenshots by eye before reporting.
 
 ## Acceptance checklist
 
-- [ ] Only files under `mysite/` changed; `git status` shows nothing outside it
-- [ ] `cd mysite && python3 -m http.server 8000` renders correctly at 375, 768 and 1440 px
+- [ ] Only files under `mysite/` changed (plus any root docs the user asked for); `git status` shows nothing else
+- [ ] No scratch, screenshot or original files inside `mysite/`
+- [ ] Renders correctly at 1440, 768 and 390 px
 - [ ] Reduced-motion preference disables animations
 - [ ] All images have alt text, dimensions and responsive sources
-- [ ] Lighthouse mobile ≥ 90 ×4
-- [ ] No references to removed assets, no console errors
+- [ ] No console errors, no 404s, no references to removed assets
+- [ ] New motion uses the shared easing and duration tokens

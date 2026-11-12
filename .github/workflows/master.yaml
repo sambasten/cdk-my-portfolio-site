@@ -49,12 +49,14 @@ jobs:
                 node-version: '22.x'
             
             - name: Validate CDK 
+              working-directory: infra
               run: |
                 npm install -g aws-cdk
                 npm install
                 cdk synth CdkMyPortfolioSiteStack
 
             - name: Deploy Stack
+              working-directory: infra
               run: |
                   cdk deploy CdkMyPortfolioSiteStack --require-approval never
 
@@ -90,7 +92,6 @@ jobs:
 
             - name: Deploy site to S3
               run: |
-                aws s3 sync ./mysite/ s3://akinwumisamuel.com --delete \
-                  --exclude "scss/*"
+                aws s3 sync ./mysite/ s3://akinwumisamuel.com --delete
 
     
