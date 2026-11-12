@@ -17,7 +17,23 @@ A static portfolio site (`mysite/`) served from a private S3 bucket through Clou
 - **IAM + GitHub OIDC**: the stack also creates the role that GitHub Actions assumes, scoped to this repo, the CDK deploy roles and this one bucket.
 - **GitHub Actions** (`.github/workflows/master.yaml`) runs two pipelines:
   - **On a pull request:** security scan (SAST, IaC and secret scanning with SARIF upload), `cdk synth`, `cdk deploy`, and then a bot comment on the PR saying it's safe to merge.
-  - **On a push to `master`:** `aws s3 sync` of `mysite/` to the bucket, deleting any removed files and skipping the `scss/` sources.
+  - **On a push to `master`:** `aws s3 sync` of `mysite/` to the bucket, deleting any removed files.
+
+## Repository layout
+
+```
+mysite/                   the static site: index.html, error.html, css/site.css, js/site.js, images/
+infra/                    the AWS CDK app
+  bin/                    CDK entry point
+  lib/                    the stack (S3, CloudFront, ACM, Route 53, IAM/OIDC role)
+  test/                   Jest tests
+  cdk.json, tsconfig.json, jest.config.js, package.json
+  .env.example            template for local CDK env vars (.env itself is git-ignored)
+  myportfoliosite.png     architecture diagram (source: myportfoliosite.excalidraw)
+.github/workflows/        the two pipelines described above
+```
+
+The site is plain HTML, CSS and JavaScript with no framework, build step or npm dependencies. Everything Node-related lives under `infra/`, so `npm install`, `npm test` and `cdk` are run from there.
 
 ## Decisions I made
 - **GitHub OIDC over IAM access keys.** The first version of the pipeline used an access key stored in GitHub secrets. I switched to OIDC: each run gets short-lived credentials for a role that only trusts this repository, so there's no key to leak or rotate. Once it worked, I deleted the old keys.

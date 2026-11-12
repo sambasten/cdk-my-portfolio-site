@@ -13,7 +13,7 @@
 
 - Site work is confined to `mysite/`. Repo housekeeping (`README.md`, `.gitignore`, `.claude/`, `CLAUDE.md`) is allowed when asked.
 - Never edit anything under `infra/` or `.github/`. These are the infrastructure and are enforced as deny rules in `.claude/settings.json`.
-- Never run `cdk`, `npx cdk` or `aws` commands. Deployment happens automatically when `master` is pushed (`aws s3 sync ./mysite/ s3://akinwumisamuel.com --delete --exclude "scss/*"`), so every change under `mysite/` is a production change once merged.
+- Never run `cdk`, `npx cdk` or `aws` commands. Deployment happens automatically when `master` is pushed (`aws s3 sync ./mysite/ s3://akinwumisamuel.com --delete`), so every change under `mysite/` is a production change once merged.
 - Never read, print or commit `infra/.env`.
 
 ## Goal (user's brief, verbatim)
